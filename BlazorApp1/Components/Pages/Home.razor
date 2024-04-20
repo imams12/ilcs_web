@@ -1,0 +1,138 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>TEST ILCS</h1>
+
+<div class="mb-3 row">
+    <label for="inputCountry" class="col-sm-2 col-form-label">Negara</label>
+    <div class="col-sm-10">
+        <input type="text" class="form-control" id="inputCountry" list="negaraList">
+        <datalist id="negaraList"></datalist>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="inputHarbor" class="col-sm-2 col-form-label">Pelabuhan</label>
+    <div class="col-sm-10">
+        <input type="text" class="form-control" id="inputPelabuhan">
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="inputProduct" class="col-sm-2 col-form-label">Barang</label>
+    <div class="col-sm-10">
+        <input type="number" class="form-control" id="inputProduct">
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="inputProduct" class="col-sm-2 col-form-label"></label>
+    <div class="col-sm-10">
+        <textarea class="form-control" id="exampleFormControlTextarea1" readonly rows="3"></textarea>
+    </div>
+</div>
+<div class="mb-3 row">
+    <label for="inputPrice" class="col-sm-2 col-form-label">Harga</label>
+    <div class="col-sm-10">
+        <input type="number" class="form-control" id="inputPricw">
+    </div>
+</div>
+<form class="row g-3 mb-3">
+    <label for="inputBea" class=" col-sm-2 form-label">Tarif Bea Masuk</label>
+    <div class="d-flex col-sm-4">
+        <input type="text" class="form-control" id="inputBea" aria-describedby="persen" readonly>
+        <span id="persen" class="form-text ms-2 fs-5 fw-bold">
+            %
+        </span>
+    </div>
+</form>
+<div class="mb-3 row">
+    <label for="inputProduct" class="col-sm-2 col-form-label"></label>
+    <div class="col-sm-10">
+        <input class="form-control" id="total" readonly/>
+    </div>
+</div>
+
+
+<script>
+
+$(document).ready(function (){
+    $("#inputCountry").autocomplete({
+        minLength: 3,
+        source: function (req, res){
+            $.ajax({
+                url: 'https://insw-dev.ilcs.co.id/n/negara',
+                dataType: 'json',
+                data: {
+                    ur_negara: req.term
+                    },
+                success: function (data){
+                    updateDatalist(data);
+                }
+            })    
+        }
+    })
+    
+    function updateDatalist(data){
+        var datalist = $('#negaraList');
+        datalist.empty();
+        data.forEach(function (item){
+            datalist.append('<option value="' + item.name.common + '">' + item.name.common + '</option>')
+        });
+    }
+});
+
+    function getKdNegara(){
+        return $('#inputCountry').val();
+    }
+    
+    $("#inputPelabuhan").autocomplete({
+        minLength: 3,
+        source: function (req, res){
+            $.ajax({
+                url: 'https://insw-dev.ilcs.co.id/n/pelabuhan',
+                dataType: 'json',
+                data: {
+                    ur_negara: getKdNegara(),
+                    ur_pelabuhan: req.term  
+                },
+                success: function (data){
+                    res(data)    
+                }
+            })
+        }
+    })
+    
+    $('#inputProduct').on('input', function() {
+            var hsCode = $(this).val();
+            if (hsCode.length >= 8) { 
+                $.ajax({
+                    url: 'https://insw-dev.ilcs.co.id/n/barang',
+                    dataType: 'json',
+                    data: {
+                        hs_code: hsCode
+                    },
+                    success: function(data) {
+                        updateDatalist(data);
+                    }
+                });
+            }
+    });
+    
+    $('#inputBea').on('input', function() {
+                var hsCode = $(this).val();
+                if (hsCode.length >= 8) {
+                    $.ajax({
+                        url: 'https://insw-dev.ilcs.co.id/n/tarif',
+                        dataType: 'json',
+                        data: {
+                            hs_code: hsCode
+                        },
+                        success: function(data) {
+                            updateDatalist(data);
+                        }
+                    });
+                }
+    });
+  
+    
+
+</script>
